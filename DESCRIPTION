@@ -1,0 +1,14 @@
+Package: rAIutils
+Title: R Utilities for Generative AI
+Version: 0.0.0.9000
+Authors@R: 
+    person("Sharon", "Machlis", , "smachlis@gmail.com", role = c("aut", "cre"))
+Description: Functions in R that re-create generative AI tasks where code exists in Python, JavaScript, and other languages but not R. Most of these functions will be created by LLMs after being given existing code in Python. First function accesses LlamaParse to convert PDFs to markdown.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    curl (>= 6.2.2),
+    httr2 (>= 1.1.2),
+    mime (>= 0.12)
