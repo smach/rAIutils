@@ -2,37 +2,62 @@
 % Please edit documentation in R/llama_parse.R
 \name{parse_pdf_to_markdown}
 \alias{parse_pdf_to_markdown}
-\title{Parse PDF to Markdown using LlamaParse API}
+\title{Parse PDF from Local File or URL to Markdown using LlamaParse API}
 \usage{
 parse_pdf_to_markdown(
-  file_path,
+  input_source,
   api_key,
   base_url = "https://api.cloud.llamaindex.ai/api/parsing",
-  poll_interval = 8
+  poll_interval = 8,
+  download_timeout = 60
 )
 }
 \arguments{
-\item{file_path}{character Path to the PDF file to parse.}
+\item{input_source}{character. Path to a local PDF file OR a URL pointing to a PDF file.}
 
-\item{api_key}{character Your LlamaParse API key.}
+\item{api_key}{character. Your LlamaParse API key.}
 
-\item{base_url}{character The base URL for the LlamaParse API.}
+\item{base_url}{character. The base URL for the LlamaParse API. Defaults to "https://api.cloud.llamaindex.ai/api/parsing".}
 
-\item{poll_interval}{integer Seconds to wait between polling for job status. Defaults to 8.}
+\item{poll_interval}{integer. Seconds to wait between polling for job status. Defaults to 8.}
+
+\item{download_timeout}{integer. Seconds to wait for the PDF download if a URL is provided. Defaults to 60.}
 }
 \value{
-The parsed markdown content as a string.
+A character string containing the parsed markdown content.
 }
 \description{
-Uploads a PDF file to the LlamaParse API, polls for job completion,
-and retrieves the parsed result as markdown text. Written by Gemini.
+Downloads a PDF if a URL is provided, then uploads the PDF to the
+LlamaParse API, polls for job completion, and retrieves the parsed
+result as markdown text. Written by Gemini.
 Requires free LlamaCloud API key.
 }
 \examples{
 \dontrun{
-  my_api_key <- "YOUR_LLAMA_CLOUD_API_KEY" # Replace with your actual key
-  pdf_file <- "/path/to/your/document.pdf" # Replace with your actual file path
-  markdown_output <- parse_pdf_to_markdown(pdf_file, my_api_key)
-  cat(markdown_output)
+  # Ensure API key is set, e.g., Sys.setenv(LLAMA_CLOUD_API_KEY="your-key")
+  my_api_key <- Sys.getenv("LLAMA_CLOUD_API_KEY")
+
+  # --- Example with a local file ---
+  # Create a dummy PDF for example if needed, or use a real one
+  dummy_file <- tempfile(fileext = ".pdf")
+  writeLines("Dummy PDF Content", dummy_file)
+  if (nchar(my_api_key) > 0 && file.exists(dummy_file)) {
+     markdown_output_file <- parse_pdf_to_markdown(dummy_file, my_api_key)
+     cat("--- File Result (First 500 chars) ---\n")
+     cat(substring(markdown_output_file, 1, 500), "\n")
+  } else {
+     message("API key not found or dummy PDF creation failed.")
+  }
+  unlink(dummy_file) # Clean up dummy file
+
+  # --- Example with a URL ---
+  pdf_url <- "https://arxiv.org/pdf/1706.03762.pdf" # Attention is All You Need paper
+  if (nchar(my_api_key) > 0) {
+    markdown_output_url <- parse_pdf_to_markdown(pdf_url, my_api_key)
+    cat("\n--- URL Result (First 500 chars) ---\n")
+    cat(substring(markdown_output_url, 1, 500), "\n")
+  } else {
+    message("API key not found.")
+  }
 }
 }
